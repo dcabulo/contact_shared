@@ -1,29 +1,31 @@
 import json
+import os
 
 import requests
-from utils.constants import GITHUB_URL, GITHUB_TOKEN, FRESHDESK_URL, FRESHDESK_ACCOUNT, FRESHDESK_TOKEN, \
-    FRESHDESK_URL_ADD_CONTACT
+from utils.constants import GITHUB_URL, FRESHDESK_URL, FRESHDESK_ACCOUNT, FRESHDESK_URL_ADD_CONTACT
 from models.user import User
 from utils.questions import which_contact_update, update_information
 
 
 def get_github_user_info():
-    headers = {"Authorization": f"Bearer {GITHUB_TOKEN}"}
+    github_token = os.getenv('GITHUB_TOKEN', '')
+    headers = {"Authorization": f"Bearer {github_token}"}
     response = requests.get(GITHUB_URL, headers=headers)
     response.raise_for_status()
     return response.json()
 
 
 def get_freshdesk_user_info(**kwargs):
+    freshdesk_token = os.getenv('FRESHDESK_TOKEN', '')
     type_account = kwargs.get("type_account")
     if type_account is None:
         raise
     if type_account == "account":
-        response = requests.get(FRESHDESK_URL + FRESHDESK_ACCOUNT, auth=(FRESHDESK_TOKEN, "x"))
+        response = requests.get(FRESHDESK_URL + FRESHDESK_ACCOUNT, auth=(freshdesk_token, "x"))
         response.raise_for_status()
         return response.json()
     if type_account == "contact":
-        response = requests.get(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT, auth=(FRESHDESK_TOKEN, "x"))
+        response = requests.get(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT, auth=(freshdesk_token, "x"))
         response.raise_for_status()
         return response.json()
 
@@ -37,25 +39,28 @@ def create_user(data: dict, user_type: str):
 
 
 def create_contact(user: User):
+    freshdesk_token = os.getenv('FRESHDESK_TOKEN', '')
     headers = {"Content-Type": "application/json"}
     password = "x"
-    response = requests.post(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT, auth=(FRESHDESK_TOKEN, password),
+    response = requests.post(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT, auth=(freshdesk_token, password),
                              data=json.dumps(user.to_dict()), headers=headers)
     response.raise_for_status()
     return response.json()
 
 
 def get_contact(id_user: int):
+    freshdesk_token = os.getenv('FRESHDESK_TOKEN', '')
     headers = {"Content-Type": "application/json"}
-    response = requests.get(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT + f"{id_user}", auth=(FRESHDESK_TOKEN, "x"),
+    response = requests.get(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT + f"{id_user}", auth=(freshdesk_token, "x"),
                             headers=headers)
     response.raise_for_status()
     return response.json()
 
 
 def update_contact(id_user: int, user: User):
+    freshdesk_token = os.getenv('FRESHDESK_TOKEN', '')
     headers = {"Content-Type": "application/json"}
-    response = requests.put(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT + f"/{id_user}", auth=(FRESHDESK_TOKEN, "x"),
+    response = requests.put(FRESHDESK_URL + FRESHDESK_URL_ADD_CONTACT + f"/{id_user}", auth=(freshdesk_token, "x"),
                             data=json.dumps(user.to_dict()), headers=headers)
     response.raise_for_status()
     return response.json()

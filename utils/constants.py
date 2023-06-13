@@ -3,9 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-FRESHDESK_TOKEN = os.getenv('FRESHDESK_TOKEN', '')
 FRESHDESK_DOMAIN = os.getenv('FRESHDESK_DOMAIN', '')
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN', '')
 
 FRESHDESK_URL_ADD_CONTACT = "contacts"
 FRESHDESK_ACCOUNT = "account"
